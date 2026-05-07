@@ -50,7 +50,7 @@ body{background:#050508;color:#c8e0b0;font-family:'Rajdhani',sans-serif;font-wei
 #main{display:flex;flex:1;overflow:hidden;}
 
 /* SIDEBAR */
-#sidebar{width:185px;background:#111a11;border-right:2px solid #3a5c2a;display:flex;flex-direction:column;padding:10px;gap:8px;flex-shrink:0;overflow-y:auto;}
+#sidebar{width:195px;background:#111a11;border-right:2px solid #3a5c2a;display:flex;flex-direction:column;padding:10px;gap:8px;flex-shrink:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#3a5c2a #0a0f0a;}
 .sidebar-title{font-family:'Bebas Neue',cursive;font-size:14px;letter-spacing:3px;color:#607050;text-align:center;padding-bottom:7px;border-bottom:1px solid #3a5c2a;}
 .troop-card{background:rgba(0,0,0,.5);border:2px solid #3a5c2a;border-radius:6px;padding:8px;cursor:grab;transition:all .2s;position:relative;overflow:hidden;}
 .troop-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:6px 6px 0 0;}
@@ -86,6 +86,18 @@ body{background:#050508;color:#c8e0b0;font-family:'Rajdhani',sans-serif;font-wei
 .log-entry.kill{border-color:#e03030;color:#ff9090;}.log-entry.gold{border-color:#f0c040;color:#ffe080;}
 .log-entry.wave{border-color:#20d0b0;color:#20d0b0;}.log-entry.place{border-color:#40d040;color:#90ff90;}
 
+
+.troop-card.detector::before{background:#e040e0;}
+.troop-card.cannon::before{background:#c0c0c0;}
+.troop-card.trapper::before{background:#a05020;}
+.troop-name.detector{color:#e040e0;}
+.troop-name.cannon{color:#c0c0c0;}
+.troop-name.trapper{color:#a05020;}
+/* Trap on canvas */
+.trap-indicator{position:absolute;pointer-events:none;}
+/* Stealth shimmer on monsters */
+@keyframes stealth-pulse{0%,100%{opacity:.18}50%{opacity:.45}}
+
 /* ══ MOBILE / TABLET ══ */
 @media (max-width: 900px) {
   #hub h1 { font-size: 44px; letter-spacing: 4px; margin-bottom: 4px; }
@@ -106,10 +118,10 @@ body{background:#050508;color:#c8e0b0;font-family:'Rajdhani',sans-serif;font-wei
   /* Sidebar goes to bottom on mobile */
   #main { flex-direction: column; }
   #sidebar {
-    width: 100%; height: 110px; flex-direction: row;
+    width: 100%; height: 120px; flex-direction: row;
     border-right: none; border-top: 2px solid #3a5c2a;
     padding: 6px 8px; gap: 8px; overflow-x: auto; overflow-y: hidden;
-    flex-shrink: 0; order: 2;
+    flex-shrink: 0; order: 2; scrollbar-width: thin;
   }
   .sidebar-title { display: none; }
   .troop-card {
@@ -271,6 +283,7 @@ body{background:#050508;color:#c8e0b0;font-family:'Rajdhani',sans-serif;font-wei
   word-break: break-all;
   max-height: 120px;
   overflow-y: auto;
+  min-height: 0;
   line-height: 1.5;
   cursor: text;
   user-select: all;
@@ -372,14 +385,30 @@ body{background:#050508;color:#c8e0b0;font-family:'Rajdhani',sans-serif;font-wei
       </div>
       <div class="troop-card gunner" draggable="true" data-type="gunner" id="card-gunner">
         <div class="troop-header"><span class="troop-emoji">🔫</span><span class="troop-name gunner">GUNNER</span></div>
-        <div class="troop-stats">🎯 Portée : Courte<br>⚡ Cadence : Très rapide<br>💥 Dégâts : Moyens</div>
+        <div class="troop-stats">🎯 Courte · ⚡ Très rapide · 💥 Moyen</div>
         <div class="troop-cost" id="cost-gunner">💰 60</div>
       </div>
+      <div class="troop-card detector" draggable="true" data-type="detector" id="card-detector">
+        <div class="troop-header"><span class="troop-emoji">👁️</span><span class="troop-name detector">DÉTECTEUR</span></div>
+        <div class="troop-stats">👻 Révèle invisibles · 🎯 Longue · ⚡ Rapide</div>
+        <div class="troop-cost" id="cost-detector">💰 70</div>
+      </div>
+      <div class="troop-card cannon" draggable="true" data-type="cannon" id="card-cannon">
+        <div class="troop-header"><span class="troop-emoji">🏰</span><span class="troop-name cannon">CANON 2×2</span></div>
+        <div class="troop-stats">🎯 Très longue · ⚡ Ultra-rapide · 📈 DPS croissant</div>
+        <div class="troop-cost" id="cost-cannon">💰 200</div>
+      </div>
+      <div class="troop-card trapper" draggable="true" data-type="trapper" id="card-trapper">
+        <div class="troop-header"><span class="troop-emoji">🪤</span><span class="troop-name trapper">PIÉGEUR</span></div>
+        <div class="troop-stats">🪤 Pose des pièges · 💥 Dégâts élevés · 🔁 Recharge auto</div>
+        <div class="troop-cost" id="cost-trapper">💰 90</div>
+      </div>
       <div class="info-panel">
-        <strong>Glisser-déposer</strong> sur l'herbe/sable.<br><br>
-        ❌ Chemin, eau, lave, rochers, arbres bloquants.<br><br>
-        🖱️ Clic droit / 🖐 Maintenir = retirer (50% remboursé).<br><br>
-        🔵 Survol = portée de tir.
+        <strong>Drag</strong> sur herbe/sable.<br><br>
+        🏰 Canon = 2×2 cases libres.<br>
+        👻 Sniper/Détecteur = voient invisibles.<br>
+        🖱️ Clic droit / 🖐 Maintenir = vendre (50%).<br>
+        🔵 Survol = portée.
       </div>
     </div>
     <div id="game-area">
@@ -518,16 +547,21 @@ const TILE_PLACEABLE = {
 //  TROOP & MONSTER DEFS
 // ══════════════════════════════════════════════
 const TROOP_DEFS = {
-  militia:{ emoji:'🗡️', color:'#40d040', range:2.5, fireRate:60,  damage:8,  cost:30, label:'Milice' },
-  sniper: { emoji:'🎯', color:'#4080ff', range:6.0, fireRate:200, damage:45, cost:80, label:'Sniper' },
-  gunner: { emoji:'🔫', color:'#ff8020', range:2.8, fireRate:25,  damage:12, cost:60, label:'Gunner' },
+  militia: { emoji:'🗡️', color:'#40d040', range:2.5, fireRate:60,  damage:8,  cost:30, label:'Milice',    canSeeInvis:false, size:1 },
+  sniper:  { emoji:'🎯', color:'#4080ff', range:6.0, fireRate:200, damage:45, cost:80, label:'Sniper',    canSeeInvis:true,  size:1 },
+  gunner:  { emoji:'🔫', color:'#ff8020', range:2.8, fireRate:25,  damage:12, cost:60, label:'Gunner',    canSeeInvis:false, size:1 },
+  detector:{ emoji:'👁️', color:'#e040e0', range:5.0, fireRate:80,  damage:10, cost:70, label:'Détecteur', canSeeInvis:true,  size:1 },
+  cannon:  { emoji:'🏰', color:'#c0c0c0', range:6.0, fireRate:18,  damage:4,  cost:200,label:'Canon',     canSeeInvis:false, size:2 },  // 2x2, rampDamage
+  trapper: { emoji:'🪤', color:'#a05020', range:2.5, fireRate:0,   damage:80, cost:90, label:'Piégeur',   canSeeInvis:true,  size:1, trapRate:600 },
 };
 
 const BASE_MONSTER_DEFS = {
-  goblin:{ emoji:'👺', hp:30,  speed:1.2,  reward:8,   color:'#a0e040', size:14, label:'Gobelin' },
-  orc:   { emoji:'👹', hp:80,  speed:0.8,  reward:20,  color:'#e06020', size:18, label:'Orc' },
-  troll: { emoji:'🧌', hp:200, speed:0.5,  reward:50,  color:'#a040e0', size:22, label:'Troll' },
-  boss:  { emoji:'💀', hp:600, speed:0.35, reward:150, color:'#e01030', size:28, label:'Boss' },
+  goblin:  { emoji:'👺', hp:30,  speed:1.2,  reward:8,   color:'#a0e040', size:14, label:'Gobelin', invis:false },
+  orc:     { emoji:'👹', hp:80,  speed:0.8,  reward:20,  color:'#e06020', size:18, label:'Orc',     invis:false },
+  troll:   { emoji:'🧌', hp:200, speed:0.5,  reward:50,  color:'#a040e0', size:22, label:'Troll',   invis:false },
+  boss:    { emoji:'💀', hp:600, speed:0.35, reward:150, color:'#e01030', size:28, label:'Boss',    invis:false },
+  speeder: { emoji:'💨', hp:25,  speed:3.2,  reward:15,  color:'#80e0ff', size:13, label:'Rapide',  invis:false },
+  ghost:   { emoji:'👻', hp:60,  speed:1.0,  reward:35,  color:'#d0b0ff', size:16, label:'Fantôme', invis:true  },
 };
 
 function getMonsterDefs(diffMult) {
@@ -543,11 +577,38 @@ function getMonsterDefs(diffMult) {
 // ══════════════════════════════════════════════
 function generateWave(waveNum) {
   const groups=[];
-  if (waveNum<=2)       { groups.push({type:'goblin',count:4+waveNum*2,interval:65-waveNum*3}); }
-  else if (waveNum<=5)  { groups.push({type:'goblin',count:6+waveNum*2,interval:Math.max(35,60-waveNum*4)}); if(waveNum>=3) groups.push({type:'orc',count:waveNum-1,interval:110}); }
-  else if (waveNum<=10) { groups.push({type:'orc',count:3+waveNum,interval:Math.max(40,80-waveNum*3)}); if(waveNum>=7) groups.push({type:'troll',count:Math.floor((waveNum-5)/2)+1,interval:180}); if(waveNum%5===0) groups.push({type:'goblin',count:8,interval:35}); }
-  else if (waveNum<=20) { groups.push({type:'orc',count:5+waveNum,interval:Math.max(30,70-waveNum*2)}); groups.push({type:'troll',count:1+Math.floor((waveNum-8)/3),interval:140}); if(waveNum%5===0) groups.push({type:'boss',count:1,interval:300}); }
-  else { const s=Math.floor((waveNum-20)/5); groups.push({type:'orc',count:8+waveNum,interval:Math.max(20,55-s*5)}); groups.push({type:'troll',count:3+Math.floor(waveNum/4),interval:Math.max(60,130-s*10)}); groups.push({type:'boss',count:1+Math.floor(s/2),interval:Math.max(120,260-s*20)}); }
+  if (waveNum<=2) {
+    groups.push({type:'goblin',count:4+waveNum*2,interval:65-waveNum*3});
+  } else if (waveNum<=4) {
+    groups.push({type:'goblin',count:6+waveNum*2,interval:Math.max(35,60-waveNum*4)});
+    groups.push({type:'orc',count:waveNum-1,interval:110});
+  } else if (waveNum<=6) {
+    groups.push({type:'orc',count:3+waveNum,interval:Math.max(40,80-waveNum*3)});
+    groups.push({type:'speeder',count:3+waveNum,interval:30});  // speeder from wave 5
+  } else if (waveNum<=10) {
+    groups.push({type:'orc',count:3+waveNum,interval:Math.max(40,80-waveNum*3)});
+    groups.push({type:'speeder',count:4+waveNum,interval:25});
+    if(waveNum>=8) groups.push({type:'troll',count:Math.floor((waveNum-5)/2)+1,interval:180});
+  } else if (waveNum<=15) {
+    groups.push({type:'orc',count:5+waveNum,interval:Math.max(30,70-waveNum*2)});
+    groups.push({type:'troll',count:1+Math.floor((waveNum-8)/3),interval:140});
+    groups.push({type:'speeder',count:5+waveNum,interval:20});
+    if(waveNum>=12) groups.push({type:'ghost',count:Math.floor((waveNum-10)/2)+1,interval:200});  // ghost from wave 12
+    if(waveNum%5===0) groups.push({type:'boss',count:1,interval:300});
+  } else if (waveNum<=25) {
+    groups.push({type:'orc',count:5+waveNum,interval:Math.max(25,60-waveNum*2)});
+    groups.push({type:'troll',count:2+Math.floor((waveNum-10)/4),interval:120});
+    groups.push({type:'ghost',count:2+Math.floor((waveNum-12)/3),interval:150});
+    groups.push({type:'speeder',count:6+waveNum,interval:18});
+    if(waveNum%5===0) groups.push({type:'boss',count:1+Math.floor((waveNum-15)/5),interval:280});
+  } else {
+    const s=Math.floor((waveNum-25)/5);
+    groups.push({type:'orc',count:8+waveNum,interval:Math.max(18,50-s*5)});
+    groups.push({type:'troll',count:3+Math.floor(waveNum/4),interval:Math.max(60,120-s*10)});
+    groups.push({type:'ghost',count:3+Math.floor(waveNum/6),interval:Math.max(80,140-s*15)});
+    groups.push({type:'speeder',count:8+waveNum,interval:Math.max(12,22-s*2)});
+    groups.push({type:'boss',count:1+Math.floor(s/2),interval:Math.max(100,240-s*20)});
+  }
   return groups;
 }
 
@@ -562,9 +623,10 @@ function freshState(b){
     troops:[], monsters:[], bullets:[],
     waveActive:false, gameOver:false,
     spawnQueue:[], spawnTimer:0,
-    costs:{militia:30,sniper:80,gunner:60},
+    costs:{militia:30,sniper:80,gunner:60,detector:70,cannon:200,trapper:90},
     floaters:[], particles:[],
     decorTiles:[],  // [{type,c,r,removed}]
+    traps:[],       // [{c,r,damage,cooldown,armed}]
   };
 }
 
@@ -900,40 +962,132 @@ function drawScene(){
 }
 
 function drawTroops(){
+  // Draw traps first (below troops)
+  for(const trap of state.traps){
+    const px=trap.c*cellW, py=trap.r*cellH;
+    const armed=trap.cooldown<=0;
+    ctx.save();
+    ctx.globalAlpha=armed?.9:.4;
+    ctx.fillStyle=armed?'#8B4513':'#555';
+    ctx.strokeStyle=armed?'#a05020':'#777';
+    ctx.lineWidth=2;
+    // X shape trap
+    ctx.beginPath();
+    ctx.moveTo(px+cellW*.2,py+cellH*.2); ctx.lineTo(px+cellW*.8,py+cellH*.8);
+    ctx.moveTo(px+cellW*.8,py+cellH*.2); ctx.lineTo(px+cellW*.2,py+cellH*.8);
+    ctx.stroke();
+    ctx.beginPath(); ctx.arc(px+cellW/2,py+cellH/2,cellW*.18,0,Math.PI*2);
+    ctx.fillStyle=armed?'#c06030':'#444'; ctx.fill(); ctx.stroke();
+    // glow when armed
+    if(armed){
+      ctx.globalAlpha=.25+.15*Math.sin(Date.now()/300);
+      ctx.fillStyle='#ff8040'; ctx.beginPath(); ctx.arc(px+cellW/2,py+cellH/2,cellW*.3,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+  }
+
   for(const t of state.troops){
     const def=TROOP_DEFS[t.type];
-    const {x,y}=gridCenter(t.c,t.r);
-    const s=Math.min(cellW,cellH);
-    // range ring
+    const isCannon=(t.type==='cannon');
+    // Cannon occupies 2x2: anchor top-left at (t.c,t.r)
+    const px=t.c*cellW, py=t.r*cellH;
+    const tw=isCannon?cellW*2:cellW, th=isCannon?cellH*2:cellH;
+    const cx=px+tw/2, cy=py+th/2;
+    const s=Math.min(tw,th);
+
+    // range ring (from center of troop)
     ctx.save(); ctx.strokeStyle=def.color; ctx.lineWidth=1;
     ctx.globalAlpha=(hoveredTroop===t)?.35:.1;
     ctx.setLineDash([4,4]);
-    ctx.beginPath(); ctx.arc(x,y,def.range*cellW,0,Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx,cy,def.range*cellW,0,Math.PI*2); ctx.stroke();
     ctx.setLineDash([]); ctx.restore();
+
     // platform
-    ctx.save(); ctx.shadowColor='rgba(0,0,0,.5)'; ctx.shadowBlur=8;
-    ctx.fillStyle='rgba(20,35,15,.85)'; ctx.strokeStyle=def.color; ctx.lineWidth=2;
-    ctx.beginPath(); ctx.roundRect(x-cellW*.42,y-cellH*.42,cellW*.84,cellH*.84,5); ctx.fill(); ctx.stroke();
+    ctx.save(); ctx.shadowColor='rgba(0,0,0,.5)'; ctx.shadowBlur=10;
+    ctx.fillStyle='rgba(20,35,15,.85)'; ctx.strokeStyle=def.color; ctx.lineWidth=isCannon?3:2;
+    if(isCannon){
+      ctx.beginPath(); ctx.roundRect(px+3,py+3,tw-6,th-6,8); ctx.fill(); ctx.stroke();
+      // Ramp indicator
+      const ramp=Math.min((t.rampStacks||0)/20,1);
+      if(ramp>0){
+        ctx.fillStyle=`rgba(255,${Math.floor(200-150*ramp)},0,${0.4*ramp})`;
+        ctx.beginPath(); ctx.roundRect(px+3,py+3,tw-6,th-6,8); ctx.fill();
+      }
+    } else {
+      ctx.beginPath(); ctx.roundRect(px+cellW*.08,py+cellH*.08,cellW*.84,cellH*.84,5); ctx.fill(); ctx.stroke();
+    }
     ctx.restore();
-    ctx.font=`${s*.55}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText(def.emoji,x,y);
-    if(t.flashTimer>0){ ctx.save(); ctx.globalAlpha=t.flashTimer/8; ctx.fillStyle='#ffee00'; ctx.beginPath(); ctx.arc(x,y,cellW*.5,0,Math.PI*2); ctx.fill(); ctx.restore(); }
+
+    ctx.font=`${s*(isCannon?.55:.55)}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(def.emoji,cx,cy);
+
+    // ramp stack label for cannon
+    if(isCannon && (t.rampStacks||0)>0){
+      ctx.fillStyle='#ffcc00'; ctx.font=`bold ${cellH*.28}px Share Tech Mono,monospace`;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('×'+(t.rampStacks||0),cx+tw*.25,cy-th*.25);
+    }
+
+    if(t.flashTimer>0){
+      ctx.save(); ctx.globalAlpha=t.flashTimer/8;
+      ctx.fillStyle='#ffee00'; ctx.beginPath(); ctx.arc(cx,cy,s*.4,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
   }
 }
 
 function drawMonsters(){
   for(const m of state.monsters){
     const def=MONSTER_DEFS[m.type];
-    ctx.save(); ctx.globalAlpha=.3; ctx.fillStyle='#000';
+    const revealed=m.revealed; // set by detector/sniper range check
+    // invisible and not revealed = very faint
+    const baseAlpha=(def.invis&&!revealed)?0.18:1.0;
+
+    ctx.save(); ctx.globalAlpha=baseAlpha*.3; ctx.fillStyle='#000';
     ctx.beginPath(); ctx.ellipse(m.x,m.y+def.size*.7,def.size*.6,def.size*.2,0,0,Math.PI*2); ctx.fill(); ctx.restore();
+
+    if(def.invis&&!revealed){
+      // Ghostly shimmer effect
+      const pulse=.13+.07*Math.sin(Date.now()/400+m.dist*.1);
+      ctx.save(); ctx.globalAlpha=pulse;
+      ctx.font=`${def.size*1.5}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(def.emoji,m.x,m.y);
+      ctx.restore();
+      continue; // skip HP bar if truly invisible
+    }
+
+    // HP bar
     const bw=def.size*2.2,bh=4;
     ctx.fillStyle='rgba(0,0,0,.7)'; ctx.fillRect(m.x-bw/2,m.y-def.size-8,bw,bh);
     const frac=m.hp/def.hp;
     ctx.fillStyle=frac>.5?'#40d040':frac>.25?'#f0c040':'#e03030';
     ctx.fillRect(m.x-bw/2,m.y-def.size-8,bw*frac,bh);
+
+    // speeder: motion blur
+    if(m.type==='speeder'){
+      ctx.save(); ctx.globalAlpha=.25;
+      ctx.font=`${def.size*1.2}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(def.emoji,m.x-8,m.y); ctx.fillText(def.emoji,m.x-16,m.y);
+      ctx.restore();
+    }
+
+    ctx.save(); ctx.globalAlpha=baseAlpha;
     ctx.font=`${def.size*1.5}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillText(def.emoji,m.x,m.y);
-    if(m.hitTimer>0){ ctx.save(); ctx.globalAlpha=m.hitTimer/10*.6; ctx.fillText(def.emoji,m.x,m.y); ctx.restore(); }
+    ctx.restore();
+
+    // ghost: revealed shimmer outline
+    if(def.invis&&revealed){
+      ctx.save(); ctx.globalAlpha=.35; ctx.strokeStyle='#e040e0'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(m.x,m.y,def.size*.9,0,Math.PI*2); ctx.stroke();
+      ctx.restore();
+    }
+
+    if(m.hitTimer>0){
+      ctx.save(); ctx.globalAlpha=m.hitTimer/10*.6;
+      ctx.font=`${def.size*1.5}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(def.emoji,m.x,m.y); ctx.restore();
+    }
   }
 }
 
@@ -976,6 +1130,9 @@ function startWave(){
   state.costs.militia=Math.round(30*mult);
   state.costs.sniper=Math.round(80*mult);
   state.costs.gunner=Math.round(60*mult);
+  state.costs.detector=Math.round(70*mult);
+  state.costs.cannon=Math.round(200*mult);
+  state.costs.trapper=Math.round(90*mult);
   updateCostUI();
   const waveData=generateWave(state.wave);
   state.spawnQueue=[];
@@ -1016,20 +1173,99 @@ function updateMonsters(){
 }
 
 function updateTroops(){
+  // 1. Compute revealed set (monsters in range of detectors or sniper)
+  const revealedIds=new Set();
   for(const t of state.troops){
     const def=TROOP_DEFS[t.type];
+    if(!def.canSeeInvis) continue;
+    const isCannon=(t.type==='cannon');
+    const cx=isCannon?t.c*cellW+cellW:gridCenter(t.c,t.r).x;
+    const cy=isCannon?t.r*cellH+cellH:gridCenter(t.c,t.r).y;
+    for(const m of state.monsters){
+      if(Math.hypot(m.x-cx,m.y-cy)<=def.range*cellW) revealedIds.add(m.id);
+    }
+  }
+  for(const m of state.monsters) m.revealed=revealedIds.has(m.id);
+
+  // 2. Update trapper traps
+  for(const t of state.troops){
+    if(t.type!=='trapper') continue;
+    t.trapTimer=(t.trapTimer||0)+1;
+    const def=TROOP_DEFS[t.type];
+    if(t.trapTimer>=def.trapRate){
+      t.trapTimer=0;
+      // Place trap on nearest open path cell not already trapped
+      const {x,y}=gridCenter(t.c,t.r);
+      let bestCell=null,bestD=Infinity;
+      for(const key of pathCells){
+        const pc=key%COLS,pr=Math.floor(key/COLS);
+        const already=state.traps.find(tr=>tr.c===pc&&tr.r===pr);
+        if(already) continue;
+        const d=Math.hypot(pc*cellW+cellW/2-x,pr*cellH+cellH/2-y);
+        if(d<bestD){bestD=d;bestCell={c:pc,r:pr};}
+      }
+      if(bestCell && bestD<=def.range*cellW*1.5){
+        state.traps.push({c:bestCell.c,r:bestCell.r,damage:def.damage,cooldown:0,armed:true});
+        addLog('🪤 Piège posé!','place');
+      }
+    }
+  }
+
+  // 3. Check traps — trigger on monsters walking over
+  const trapRem=[];
+  for(const trap of state.traps){
+    if(trap.cooldown>0){trap.cooldown--;continue;}
+    for(const m of state.monsters){
+      const tc=Math.floor(m.x/cellW),tr2=Math.floor(m.y/cellH);
+      if(tc===trap.c&&tr2===trap.r){
+        m.hp-=trap.damage; m.hitTimer=12;
+        addFloater('💥'+trap.damage,m.x,m.y-25,'#ff8040',18);
+        addParticles(m.x,m.y,'💥',6,'#ff8040');
+        if(m.hp<=0) killMonster(m);
+        trap.cooldown=180; // recharge
+        addLog('🪤 Piège déclenché!','kill');
+        break;
+      }
+    }
+  }
+
+  // 4. Fire turrets
+  for(const t of state.troops){
+    const def=TROOP_DEFS[t.type];
+    if(t.type==='trapper') continue; // trapper doesn't shoot
     if(t.flashTimer>0) t.flashTimer--;
     t.cooldown=t.cooldown||0;
     if(t.cooldown>0){t.cooldown--;continue;}
-    const {x,y}=gridCenter(t.c,t.r);
+    const isCannon=(t.type==='cannon');
+    const cx=isCannon?t.c*cellW+cellW:gridCenter(t.c,t.r).x;
+    const cy=isCannon?t.r*cellH+cellH:gridCenter(t.c,t.r).y;
     let best=null,bd=Infinity;
     for(const m of state.monsters){
-      const d=Math.hypot(m.x-x,m.y-y);
-      if(d<=def.range*cellW&&d<bd){best=m;bd=d;}
+      if(MONSTER_DEFS[m.type].invis && !m.revealed && !def.canSeeInvis) continue;
+      const d=Math.hypot(m.x-cx,m.y-cy);
+      if(d<=def.range*cellW&&d<bd){
+        // Cannon: prioritize target it's already ramping on
+        if(isCannon && t.rampTarget===m.id) { best=m; break; }
+        best=m; bd=d;
+      }
     }
     if(best){
-      state.bullets.push({x,y,troopType:t.type,target:best,speed:8+(t.type==='sniper'?6:0),damage:def.damage});
-      t.cooldown=def.fireRate; t.flashTimer=8;
+      // Cannon ramp damage
+      let dmg=def.damage;
+      if(isCannon){
+        if(t.rampTarget===best.id){
+          t.rampStacks=Math.min((t.rampStacks||0)+1,30);
+        } else {
+          t.rampTarget=best.id; t.rampStacks=0;
+        }
+        dmg=def.damage+Math.floor((t.rampStacks||0)*1.5);
+      }
+      const spd=t.type==='sniper'?14:t.type==='cannon'?16:8;
+      state.bullets.push({x:cx,y:cy,troopType:t.type,target:best,speed:spd,damage:dmg});
+      t.cooldown=def.fireRate; t.flashTimer=isCannon?4:8;
+    } else {
+      // Cannon loses ramp if no target
+      if(isCannon && (t.rampStacks||0)>0) t.rampStacks=Math.max(0,(t.rampStacks||0)-1);
     }
   }
 }
@@ -1091,13 +1327,16 @@ function updateUI(){
   document.getElementById('hp-display').textContent=state.hp;
   document.getElementById('wave-display').textContent=state.wave;
   document.getElementById('kills-display').textContent=state.kills;
-  for(const type of ['militia','sniper','gunner'])
+  for(const type of ['militia','sniper','gunner','detector','cannon','trapper'])
     document.getElementById('card-'+type).classList.toggle('unaffordable',state.gold<state.costs[type]);
 }
 function updateCostUI(){
   document.getElementById('cost-militia').textContent='💰 '+state.costs.militia;
   document.getElementById('cost-sniper').textContent='💰 '+state.costs.sniper;
   document.getElementById('cost-gunner').textContent='💰 '+state.costs.gunner;
+  document.getElementById('cost-detector').textContent='💰 '+state.costs.detector;
+  document.getElementById('cost-cannon').textContent='💰 '+state.costs.cannon;
+  document.getElementById('cost-trapper').textContent='💰 '+state.costs.trapper;
 }
 
 // ══════════════════════════════════════════════
@@ -1126,25 +1365,40 @@ function tryPlaceTroop(px, py) {
   if (!dragging || state.gameOver) return false;
   const rect = canvas.getBoundingClientRect();
   const {c, r} = pixelToGrid(px - rect.left, py - rect.top);
-  if (c < 0 || c >= COLS || r < 0 || r >= ROWS) return false;
-  if (isBlocked(c, r))  { addLog('❌ Case bloquée!', ''); return false; }
-  if (state.troops.find(t => t.c===c && t.r===r)) { addLog('❌ Case occupée!', ''); return false; }
+  const def = TROOP_DEFS[dragging];
+  const sz = def.size || 1;
+  // Check all cells the troop will occupy
+  for(let dc=0; dc<sz; dc++) for(let dr=0; dr<sz; dr++){
+    const cc=c+dc, rr=r+dr;
+    if(cc<0||cc>=COLS||rr<0||rr>=ROWS){ addLog('❌ Hors du terrain!',''); return false; }
+    if(isBlocked(cc,rr)){ addLog('❌ Case bloquée!',''); return false; }
+    if(state.troops.find(t=>{
+      const ts=TROOP_DEFS[t.type].size||1;
+      for(let ddc=0;ddc<ts;ddc++) for(let ddr=0;ddr<ts;ddr++) if(t.c+ddc===cc&&t.r+ddr===rr) return true;
+      return false;
+    })){ addLog('❌ Case occupée!',''); return false; }
+  }
   const cost = state.costs[dragging];
   if (state.gold < cost) return false;
   state.gold -= cost;
-  const dec = state.decorTiles.find(d => d.c===c && d.r===r && !d.removed);
-  if (dec) dec.removed = true;
-  state.troops.push({type: dragging, c, r, cooldown: 0, flashTimer: 0});
-  addLog(`${TROOP_DEFS[dragging].label} déployé(e)!`, 'place');
-  const cr = canvas.getBoundingClientRect();
-  addFloater('-'+cost+'💰', c*cellW+cellW/2, r*cellH+cellH/2, '#f0c040', 16);
+  // Remove decor tiles under footprint
+  for(let dc=0; dc<sz; dc++) for(let dr=0; dr<sz; dr++){
+    const dec = state.decorTiles.find(d => d.c===c+dc && d.r===r+dr && !d.removed);
+    if(dec) dec.removed = true;
+  }
+  state.troops.push({type:dragging, c, r, cooldown:0, flashTimer:0});
+  addLog(`${def.label} déployé(e)!`, 'place');
+  addFloater('-'+cost+'💰', c*cellW+sz*cellW/2, r*cellH+sz*cellH/2, '#f0c040', 16);
   return true;
 }
 
 function sellTroopAt(px, py) {
   const rect = canvas.getBoundingClientRect();
   const {c, r} = pixelToGrid(px - rect.left, py - rect.top);
-  const idx = state.troops.findIndex(t => t.c===c && t.r===r);
+  const idx = state.troops.findIndex(t => {
+    const sz=TROOP_DEFS[t.type].size||1;
+    return c>=t.c&&c<t.c+sz&&r>=t.r&&r<t.r+sz;
+  });
   if (idx >= 0) {
     const t = state.troops[idx];
     const refund = Math.floor(state.costs[t.type] * .5);
@@ -1162,16 +1416,24 @@ function moveGhost(x, y) {
 }
 
 function updateTouchIndicator(px, py, visible) {
-  if (!visible) { touchInd.style.display = 'none'; return; }
+  if (!visible || !dragging) { touchInd.style.display = 'none'; return; }
   const rect = canvas.getBoundingClientRect();
   const {c, r} = pixelToGrid(px - rect.left, py - rect.top);
-  if (c < 0 || c >= COLS || r < 0 || r >= ROWS) { touchInd.style.display = 'none'; return; }
-  const blocked = isBlocked(c, r) || !!state.troops.find(t => t.c===c && t.r===r);
+  const sz = (TROOP_DEFS[dragging]||{}).size||1;
+  if (c < 0 || c+sz > COLS || r < 0 || r+sz > ROWS) { touchInd.style.display = 'none'; return; }
+  let blocked=false;
+  for(let dc=0;dc<sz&&!blocked;dc++) for(let dr=0;dr<sz&&!blocked;dr++){
+    if(isBlocked(c+dc,r+dr)||state.troops.find(t=>{
+      const ts=TROOP_DEFS[t.type].size||1;
+      for(let ddc=0;ddc<ts;ddc++) for(let ddr=0;ddr<ts;ddr++) if(t.c+ddc===c+dc&&t.r+ddr===r+dr) return true;
+      return false;
+    })) blocked=true;
+  }
   touchInd.style.display = 'block';
   touchInd.style.left   = (rect.left + c * cellW) + 'px';
   touchInd.style.top    = (rect.top  + r * cellH) + 'px';
-  touchInd.style.width  = cellW + 'px';
-  touchInd.style.height = cellH + 'px';
+  touchInd.style.width  = (cellW*sz) + 'px';
+  touchInd.style.height = (cellH*sz) + 'px';
   touchInd.classList.toggle('blocked', blocked);
 }
 
@@ -1359,7 +1621,7 @@ function generateSaveCode() {
     w: state.wave,
     k: state.kills,
     costs: state.costs,
-    troops: state.troops.map(t => [t.type[0], t.c, t.r]),
+    troops: state.troops.map(t => [{militia:'m',sniper:'s',gunner:'g',detector:'d',cannon:'c',trapper:'t'}[t.type]||t.type[0], t.c, t.r]),
     decRemoved: state.decorTiles.map((d,i) => d.removed ? i : -1).filter(i => i >= 0),
   };
   const json = JSON.stringify(snap);
@@ -1404,7 +1666,7 @@ function restoreFromSnap(snap) {
   state.wave  = snap.w;
   state.kills = snap.k;
   state.costs = snap.costs || state.costs;
-  const typeMap = { m:'militia', s:'sniper', g:'gunner' };
+  const typeMap = { m:'militia', s:'sniper', g:'gunner', d:'detector', c:'cannon', t:'trapper' };
   state.troops = (snap.troops || []).map(([tc, c, r]) => ({
     type: typeMap[tc] || tc, c, r, cooldown: 0, flashTimer: 0
   }));
