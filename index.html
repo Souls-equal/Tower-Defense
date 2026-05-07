@@ -156,6 +156,141 @@ body{background:#050508;color:#c8e0b0;font-family:'Rajdhani',sans-serif;font-wei
   display: none; white-space: nowrap; font-family: 'Share Tech Mono', monospace;
 }
 
+
+/* ══ SAVE / LOAD ══ */
+#hub-save-section {
+  margin-top: 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 600px;
+}
+.save-sep {
+  width: 100%; display: flex; align-items: center; gap: 12px;
+  color: #3a5c2a; font-size: 12px; font-family: 'Share Tech Mono', monospace;
+}
+.save-sep::before, .save-sep::after { content: ''; flex: 1; height: 1px; background: #3a5c2a; }
+
+#load-input {
+  width: 100%;
+  background: rgba(0,0,0,.6);
+  border: 1px solid #3a5c2a;
+  border-radius: 6px;
+  padding: 10px 14px;
+  color: #c8e0b0;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  resize: none;
+  height: 70px;
+  outline: none;
+  transition: border-color .2s;
+}
+#load-input:focus { border-color: #f0c040; }
+#load-input::placeholder { color: #3a5c2a; }
+
+.save-btn-row { display: flex; gap: 10px; }
+.save-action-btn {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 16px;
+  letter-spacing: 2px;
+  padding: 8px 22px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all .2s;
+  border: 2px solid;
+}
+.save-action-btn.load {
+  background: rgba(64,128,255,.1);
+  border-color: #4080ff;
+  color: #4080ff;
+}
+.save-action-btn.load:hover { background: rgba(64,128,255,.25); box-shadow: 0 0 16px rgba(64,128,255,.4); }
+.save-action-btn.clear {
+  background: rgba(96,112,80,.1);
+  border-color: #607050;
+  color: #607050;
+  font-size: 13px;
+}
+.save-action-btn.clear:hover { border-color: #c8e0b0; color: #c8e0b0; }
+
+#load-status {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  min-height: 16px;
+  text-align: center;
+}
+#load-status.ok  { color: #40d040; }
+#load-status.err { color: #e03030; }
+
+/* In-game save button */
+#save-btn {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 15px;
+  letter-spacing: 2px;
+  padding: 7px 14px;
+  background: rgba(240,192,64,.1);
+  border: 1px solid #f0c040;
+  color: #f0c040;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all .2s;
+}
+#save-btn:hover { background: rgba(240,192,64,.25); }
+
+/* Save modal */
+#save-modal {
+  position: fixed; inset: 0; z-index: 200;
+  display: none; align-items: center; justify-content: center;
+  background: rgba(0,0,0,.75);
+}
+#save-modal-box {
+  background: #111a11;
+  border: 2px solid #f0c040;
+  border-radius: 10px;
+  padding: 28px 32px;
+  width: min(540px, 92vw);
+  display: flex; flex-direction: column; gap: 14px;
+  box-shadow: 0 0 40px rgba(240,192,64,.2);
+}
+#save-modal-box h3 {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 24px; letter-spacing: 3px; color: #f0c040;
+  text-align: center;
+}
+#save-modal-box p { font-size: 12px; color: #607050; text-align: center; line-height: 1.6; }
+#save-code-area {
+  background: rgba(0,0,0,.6);
+  border: 1px solid #3a5c2a;
+  border-radius: 5px;
+  padding: 10px;
+  color: #80b060;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  word-break: break-all;
+  max-height: 120px;
+  overflow-y: auto;
+  line-height: 1.5;
+  cursor: text;
+  user-select: all;
+}
+.modal-btn-row { display: flex; gap: 10px; justify-content: center; }
+.modal-btn {
+  font-family: 'Bebas Neue', cursive; font-size: 17px; letter-spacing: 2px;
+  padding: 8px 22px; border-radius: 5px; cursor: pointer; transition: all .2s; border: 2px solid;
+}
+.modal-btn.copy { background: rgba(64,208,64,.1); border-color: #40d040; color: #40d040; }
+.modal-btn.copy:hover { background: rgba(64,208,64,.25); }
+.modal-btn.close { background: rgba(96,112,80,.1); border-color: #607050; color: #607050; }
+.modal-btn.close:hover { border-color: #c8e0b0; color: #c8e0b0; }
+#copy-feedback { font-size: 11px; color: #40d040; text-align: center; min-height: 14px; font-family: 'Share Tech Mono', monospace; }
+
+@media (max-width: 900px) {
+  #save-btn { font-size: 12px; padding: 6px 10px; }
+  #hub-save-section { max-width: 95vw; }
+}
+
 </style>
 </head>
 <body>
@@ -195,6 +330,17 @@ body{background:#050508;color:#c8e0b0;font-family:'Rajdhani',sans-serif;font-wei
       <div class="diff-bio">Mine d'améthyste. Lumière violette, effets psychédéliques. Bonne chance.</div>
       <div class="diff-stars">★★★★★</div>
     </div>
+
+  <div id="hub-save-section">
+    <div class="save-sep">REPRENDRE UNE PARTIE</div>
+    <textarea id="load-input" placeholder="Collez votre code de sauvegarde ici…" spellcheck="false"></textarea>
+    <div class="save-btn-row">
+      <button class="save-action-btn load" onclick="loadFromCode()">▶ CHARGER</button>
+      <button class="save-action-btn clear" onclick="document.getElementById('load-input').value='';document.getElementById('load-status').textContent='';document.getElementById('load-status').className=''">✕ EFFACER</button>
+    </div>
+    <div id="load-status"></div>
+  </div>
+
   </div>
 </div>
 
@@ -208,6 +354,7 @@ body{background:#050508;color:#c8e0b0;font-family:'Rajdhani',sans-serif;font-wei
     <div class="stat-box"><span class="stat-icon">🌊</span><div><div class="stat-label">Vague</div><div class="stat-val sv-wave" id="wave-display">0</div></div></div>
     <div class="stat-box"><span class="stat-icon">💀</span><div><div class="stat-label">Kills</div><div class="stat-val" id="kills-display" style="color:#e03030">0</div></div></div>
     <button id="wave-btn">⚔ LANCER LA VAGUE</button>
+    <button id="save-btn" onclick="openSaveModal()">💾 SAUV.</button>
     <button id="hub-btn">⬅ HUB</button>
   </div>
   <div id="main">
@@ -285,11 +432,11 @@ const BIOMES = {
     ground:'grass', path:'dirt',
     decor:[
       ['tree',2,1],['tree',3,0],['tree',14,1],['tree',15,2],['tree',20,0],
-      ['tree',21,2],['tree',1,10],['tree',0,9],['tree',19,11],
+      ['tree',1,10],['tree',0,9],['tree',19,11],
       ['water',6,7],['water',7,7],['water',6,8],['water',7,8],['water',8,8],
       ['water',6,9],['water',7,9],
       ['water',16,3],['water',17,3],['water',16,4],
-      ['tall_grass',4,1],['tall_grass',10,10],['tall_grass',18,8],
+      ['tall_grass',4,1],['tall_grass',10,10],
       ['small_rock',11,6],['small_rock',12,7],
     ],
     waypoints:[
@@ -305,11 +452,11 @@ const BIOMES = {
     diffMult: 1.7, startGold: 200, startHP: 18,
     ground:'sand', path:'sand_path',
     decor:[
-      ['cactus',2,1],['cactus',5,4],['cactus',9,8],['cactus',14,2],
-      ['cactus',18,10],['cactus',20,5],['cactus',3,11],['cactus',11,0],
-      ['small_rock',7,3],['small_rock',16,7],['small_rock',6,11],
+      ['cactus',2,1],['cactus',5,4],['cactus',9,8],
+      ['cactus',20,5],['cactus',3,11],['cactus',11,0],
+      ['small_rock',16,7],['small_rock',6,11],
       ['skull',4,8],['skull',13,5],
-      ['tall_grass',1,6],['tall_grass',21,3],
+      ['tall_grass',21,3],
     ],
     waypoints:[
       {x:0,y:6},{x:7,y:6},{x:7,y:2},{x:15,y:2},
@@ -323,9 +470,9 @@ const BIOMES = {
     diffMult: 2.2, startGold: 220, startHP: 15,
     ground:'volcanic', path:'lava_path',
     decor:[
-      ['lava',3,4],['lava',4,4],['lava',3,5],['lava',4,5],['lava',5,5],
+      ['lava',3,4],['lava',4,4],['lava',3,5],['lava',4,5],
       ['lava',14,7],['lava',15,7],['lava',14,8],['lava',15,8],
-      ['lava',19,2],['lava',20,2],['lava',20,3],
+      ['lava',19,2],['lava',20,2],
       ['dark_rock',1,2],['dark_rock',6,8],['dark_rock',11,3],
       ['dark_rock',17,10],['dark_rock',21,6],['dark_rock',8,11],
       ['dark_rock',2,9],['dark_rock',13,0],
@@ -343,7 +490,7 @@ const BIOMES = {
     ground:'amethyst', path:'crystal_path',
     decor:[
       ['amethyst_rock',2,0],['amethyst_rock',3,1],['amethyst_rock',8,4],
-      ['amethyst_rock',9,3],['amethyst_rock',14,7],['amethyst_rock',15,8],
+      ['amethyst_rock',14,7],['amethyst_rock',15,8],
       ['amethyst_rock',19,1],['amethyst_rock',20,0],['amethyst_rock',21,11],
       ['amethyst_rock',1,11],['amethyst_rock',5,8],['amethyst_rock',11,10],
       ['crystal',6,2],['crystal',12,5],['crystal',17,9],['crystal',4,10],
@@ -440,16 +587,18 @@ function resize(){
 
 function buildPath(){
   const wp=biome.waypoints;
-  pathPoints=wp.map(p=>({x:p.x*cellW, y:p.y*cellH+cellH/2}));
+  // pixel coords: center of each waypoint cell, for monster movement
+  pathPoints=wp.map(p=>({x:p.x*cellW+cellW/2, y:p.y*cellH+cellH/2}));
+  if(wp[0].x===0) pathPoints[0].x=0;
+  if(wp[wp.length-1].x>=COLS) pathPoints[wp.length-1].x=canvasW;
   pathCells.clear();
-  const hw=cellH*0.8;
-  for(let i=0;i<pathPoints.length-1;i++){
-    const a=pathPoints[i],b=pathPoints[i+1];
-    const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy);
-    for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
-      const cx=c*cellW+cellW/2,cy=r*cellH+cellH/2;
-      const t=Math.max(0,Math.min(1,((cx-a.x)*dx+(cy-a.y)*dy)/(len*len)));
-      if(Math.hypot(cx-a.x-t*dx,cy-a.y-t*dy)<hw) pathCells.add(r*COLS+c);
+  // All segments axis-aligned: walk grid coords directly
+  for(let i=0;i<wp.length-1;i++){
+    const a=wp[i],b=wp[i+1];
+    const c0=Math.min(a.x,b.x),c1=Math.max(a.x,b.x);
+    const r0=Math.min(a.y,b.y),r1=Math.max(a.y,b.y);
+    for(let r=r0;r<=r1;r++) for(let c=c0;c<=Math.min(c1,COLS-1);c++){
+      if(r>=0&&r<ROWS&&c>=0&&c<COLS) pathCells.add(r*COLS+c);
     }
   }
   rebuildBlockCells();
@@ -458,8 +607,13 @@ function buildPath(){
 function rebuildBlockCells(){
   blockCells.clear();
   for(const key of pathCells) blockCells.add(key);
+  // Auto-remove decor tiles that overlap the path (can happen on resize or biome load)
   for(const d of state.decorTiles){
     if(d.removed) continue;
+    if(pathCells.has(d.r*COLS+d.c)){
+      d.removed=true; // silently hide tiles under path
+      continue;
+    }
     const placeable=TILE_PLACEABLE[d.type];
     if(placeable===false) blockCells.add(d.r*COLS+d.c);
   }
@@ -1149,6 +1303,7 @@ function startGame(diffKey){
   document.getElementById('hub').style.display='none';
   document.getElementById('game-screen').style.display='flex';
   document.getElementById('overlay').style.display='none';
+  document.getElementById('wave-btn').disabled=false;
   // Badge
   const badge=document.getElementById('diff-badge');
   badge.textContent=biome.badge;
@@ -1190,6 +1345,150 @@ function gameLoop(){
   requestAnimationFrame(gameLoop);
 }
 gameLoop();
+
+// ══════════════════════════════════════════════
+//  SAVE / LOAD SYSTEM
+// ══════════════════════════════════════════════
+
+function generateSaveCode() {
+  const snap = {
+    v: 2,
+    d: Object.keys(BIOMES).find(k => BIOMES[k] === biome),
+    g: state.gold,
+    hp: state.hp,
+    w: state.wave,
+    k: state.kills,
+    costs: state.costs,
+    troops: state.troops.map(t => [t.type[0], t.c, t.r]),
+    decRemoved: state.decorTiles.map((d,i) => d.removed ? i : -1).filter(i => i >= 0),
+  };
+  const json = JSON.stringify(snap);
+  const b64 = btoa(unescape(encodeURIComponent(json)));
+  let cs = 0;
+  for (let i = 0; i < json.length; i++) cs = (cs + json.charCodeAt(i)) % 997;
+  const checksum = String(cs).padStart(3, '0');
+  const blocks = b64.match(/.{1,60}/g) || [b64];
+  return 'IB2-' + checksum + '-' + blocks.join('-');
+}
+
+function parseSaveCode(raw) {
+  const code = raw.trim().replace(/\s+/g, '');
+  if (!code.startsWith('IB2-')) throw new Error('Code invalide (préfixe manquant)');
+  const parts = code.slice(4).split('-');
+  if (parts.length < 2) throw new Error('Code invalide (format incorrect)');
+  const checksum = parts[0];
+  const b64 = parts.slice(1).join('');
+  let json;
+  try { json = decodeURIComponent(escape(atob(b64))); }
+  catch(e) { throw new Error('Code corrompu (base64 invalide)'); }
+  let cs = 0;
+  for (let i = 0; i < json.length; i++) cs = (cs + json.charCodeAt(i)) % 997;
+  if (String(cs).padStart(3,'0') !== checksum) throw new Error('Code corrompu (checksum invalide)');
+  const snap = JSON.parse(json);
+  if (!snap.v || snap.v !== 2) throw new Error('Version de sauvegarde incompatible');
+  if (!snap.d || !BIOMES[snap.d]) throw new Error('Difficulté inconnue dans la sauvegarde');
+  return snap;
+}
+
+function restoreFromSnap(snap) {
+  const diffKey = snap.d;
+  biome = BIOMES[diffKey];
+  MONSTER_DEFS = getMonsterDefs(biome.diffMult);
+  state = freshState(biome);
+  state.decorTiles = biome.decor.map(([type,c,r]) => ({type,c,r,removed:false}));
+  for (const i of (snap.decRemoved || [])) {
+    if (state.decorTiles[i]) state.decorTiles[i].removed = true;
+  }
+  state.gold  = snap.g;
+  state.hp    = snap.hp;
+  state.wave  = snap.w;
+  state.kills = snap.k;
+  state.costs = snap.costs || state.costs;
+  const typeMap = { m:'militia', s:'sniper', g:'gunner' };
+  state.troops = (snap.troops || []).map(([tc, c, r]) => ({
+    type: typeMap[tc] || tc, c, r, cooldown: 0, flashTimer: 0
+  }));
+  document.getElementById('hub').style.display = 'none';
+  document.getElementById('game-screen').style.display = 'flex';
+  document.getElementById('overlay').style.display = 'none';
+  document.getElementById('wave-btn').disabled = false;
+  const badge = document.getElementById('diff-badge');
+  badge.textContent = biome.badge;
+  badge.style.color = biome.color;
+  badge.style.borderColor = biome.color;
+  updateCostUI();
+  particles2 = [];
+  resize();
+  addLog('Partie restaurée — Vague ' + state.wave + ', ' + state.gold + 'or', 'wave');
+}
+
+function loadFromCode() {
+  const raw = document.getElementById('load-input').value;
+  const statusEl = document.getElementById('load-status');
+  if (!raw.trim()) {
+    statusEl.textContent = 'Collez un code de sauvegarde.';
+    statusEl.className = 'err';
+    return;
+  }
+  try {
+    const snap = parseSaveCode(raw);
+    restoreFromSnap(snap);
+    statusEl.textContent = '';
+    statusEl.className = '';
+    document.getElementById('load-input').value = '';
+  } catch(e) {
+    statusEl.textContent = e.message;
+    statusEl.className = 'err';
+  }
+}
+
+function openSaveModal() {
+  if (!biome) return;
+  const code = generateSaveCode();
+  document.getElementById('save-code-area').textContent = code;
+  document.getElementById('copy-feedback').textContent = '';
+  document.getElementById('save-modal').style.display = 'flex';
+}
+
+function closeSaveModal() {
+  document.getElementById('save-modal').style.display = 'none';
+}
+
+function copyCode() {
+  const code = document.getElementById('save-code-area').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const fb = document.getElementById('copy-feedback');
+    fb.textContent = 'Copie dans le presse-papiers!';
+    setTimeout(() => { fb.textContent = ''; }, 2500);
+  }).catch(() => {
+    const area = document.getElementById('save-code-area');
+    const range = document.createRange();
+    range.selectNodeContents(area);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.getElementById('copy-feedback').textContent = 'Selectionne - Ctrl+C pour copier';
+  });
+}
+
+document.getElementById('save-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('save-modal')) closeSaveModal();
+});
+
 </script>
+
+<!-- ══ SAVE MODAL ══ -->
+<div id="save-modal">
+  <div id="save-modal-box">
+    <h3>💾 CODE DE SAUVEGARDE</h3>
+    <p>Copiez ce code et gardez-le précieusement.<br>Collez-le dans le Hub pour reprendre votre partie.</p>
+    <div id="save-code-area" onclick="this.focus();document.execCommand('selectAll')"></div>
+    <div class="modal-btn-row">
+      <button class="modal-btn copy" onclick="copyCode()">📋 COPIER</button>
+      <button class="modal-btn close" onclick="closeSaveModal()">✕ FERMER</button>
+    </div>
+    <div id="copy-feedback"></div>
+  </div>
+</div>
+
 </body>
 </html>
