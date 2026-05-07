@@ -52,7 +52,19 @@ body{background:#050508;color:#c8e0b0;font-family:'Rajdhani',sans-serif;font-wei
 /* SIDEBAR */
 #sidebar{width:195px;background:#111a11;border-right:2px solid #3a5c2a;display:flex;flex-direction:column;padding:10px;gap:8px;flex-shrink:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#3a5c2a #0a0f0a;}
 .sidebar-title{font-family:'Bebas Neue',cursive;font-size:14px;letter-spacing:3px;color:#607050;text-align:center;padding-bottom:7px;border-bottom:1px solid #3a5c2a;}
-.troop-card{background:rgba(0,0,0,.5);border:2px solid #3a5c2a;border-radius:6px;padding:8px;cursor:grab;transition:all .2s;position:relative;overflow:hidden;}
+
+.troop-card {
+  background: rgba(0,0,0,.5);
+  border: 2px solid #3a5c2a;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: grab;
+  transition: all .2s;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
 .troop-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:6px 6px 0 0;}
 .troop-card.militia::before{background:#40d040;}.troop-card.sniper::before{background:#4080ff;}.troop-card.gunner::before{background:#ff8020;}
 .troop-card:hover{border-color:#f0c040;transform:translateY(-2px);box-shadow:0 4px 15px rgba(0,0,0,.5);}
